@@ -11,7 +11,7 @@ COPY . .
 RUN go build -o main .
 
 # 開放容器的端口
-EXPOSE 8080
+EXPOSE 5001
 
 # 定義啟動容器時運行的命令
 CMD ["./main"]

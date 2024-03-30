@@ -1,37 +1,48 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-
-	"github.com/gorilla/mux"
 )
 
+// ReverseProxyHandler 生成並返回處理反向代理請求的處理函數
+func ReverseProxyHandler(target *url.URL) http.HandlerFunc {
+	proxy := httputil.NewSingleHostReverseProxy(target)
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL)
+		r.Host = target.Host
+		w.Header().Set("X-Ben", "Rad")
+		proxy.ServeHTTP(w, r)
+	}
+}
+
+// parseURL 將給定的 URL 字符串解析為 *url.URL 對象
+func parseURL(rawURL string) *url.URL {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		log.Fatalf("Failed to parse URL: %v", err)
+	}
+	return parsedURL
+}
+
 func main() {
-	router := mux.NewRouter()
-
-	// 建立目標 URL
-	targetURL1, err := url.Parse("http://127.0.0.1:5000")
-	if err != nil {
-		log.Fatal("Error parsing target URL1:", err)
+	// 定義反向代理目標
+	targets := map[string]*url.URL{
+		"/api1/": parseURL("http://localhost:5000"),
+		"/api2/": parseURL("http://localhost:5001"),
 	}
 
-	targetURL2, err := url.Parse("http://127.0.0.1:5001")
-	if err != nil {
-		log.Fatal("Error parsing target URL2:", err)
+	// 設置反向代理處理函數
+	for path, target := range targets {
+		http.HandleFunc(path, ReverseProxyHandler(target))
 	}
 
-	// 建立反向代理
-	proxy1 := httputil.NewSingleHostReverseProxy(targetURL1)
-	proxy2 := httputil.NewSingleHostReverseProxy(targetURL2)
-
-	// 設定代理的路徑
-	router.PathPrefix("/").Handler(proxy1)
-	router.PathPrefix("/v2/").Handler(proxy2)
-
-	fmt.Println("Starting server on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	// 啟動服務器
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
 }

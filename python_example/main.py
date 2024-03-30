@@ -19,7 +19,7 @@ tasks = [
 ]
 
 # 獲取所有任務
-@app.route('/tasks', methods=['GET'])
+@app.route('/api1/tasks', methods=['GET'])
 def get_tasks():
     return jsonify({'tasks': tasks})
 
