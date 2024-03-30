@@ -32,8 +32,8 @@ func main() {
 	// 定義反向代理目標
 	targets := map[string]*url.URL{
 		"/":      parseURL("http://google.com"),
-		"/api1/": parseURL("http://172.24.0.4:5000"), // Python
-		"/api2/": parseURL("http://172.24.0.3:5001"), // Go
+		"/api1/": parseURL("http://172.25.0.3:5000"), // Python
+		"/api2/": parseURL("http://172.25.0.4:5001"), // Go
 	}
 
 	// 設置反向代理處理函數
