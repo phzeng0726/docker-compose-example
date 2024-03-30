@@ -5,16 +5,34 @@ services:
     build: ./reverse_proxy_example
     ports:
       - "8080:8080"
-    depends_on: # Docker Compose 會確保在啟動這些服務時，所依賴的服務會在其前被啟動。
+    depends_on:
       - go_example
       - python_example
+    networks:
+      testing_network:
+        # ipv4_address: 172.24.0.2
 
   python_example:
     build: ./python_example
     ports:
       - "5000:5000"
+    networks:
+      testing_network:
+        # ipv4_address: 172.24.0.3 # 要怎麼讓他們固定
 
   go_example:
     build: ./go_example
     ports:
       - "5001:5001"
+    networks:
+      testing_network:
+        # ipv4_address: 172.24.0.4
+
+networks:
+  testing_network:
+    external: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.24.0.0/16
+          gateway: 172.24.0.1
