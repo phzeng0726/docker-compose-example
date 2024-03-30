@@ -43,7 +43,7 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 func main() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/v2/tasks/{id}", GetTask).Methods("GET")
+	router.HandleFunc("/api2/tasks/{id}", GetTask).Methods("GET")
 
 	fmt.Println("Starting server on port 5001...")
 	log.Fatal(http.ListenAndServe(":5001", router))
